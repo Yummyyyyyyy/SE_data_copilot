@@ -57,6 +57,56 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6  grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div v-if="sparkResults.length">
+                                <h2>Results by Spark LLM</h2>
+                                <p class="card-title">Query Results</p>
+                                <div class="table-responsive">
+                                    <table id="query-results-listing-spark" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th v-for="column in sparkColumns" :key="column">{{ column }}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="(row, rowIndex) in sparkResults" :key="rowIndex">
+                                            <td v-for="(value, key) in row" :key="key">{{ value }}</td>
+                                        </tr>
+                                        </tbody>
+                                </table>
+                                </div>
+                                <div v-if="sparkError" class="error">{{ sparkError }}</div>
+                            </div>
+                     </div>
+                    </div>
+                </div>
+                <div class="col-md-6  grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <div v-if="tencentResults.length">
+                                <h2>Results by Tencent</h2>
+                                <p class="card-title">Query Results</p>
+                                <div class="table-responsive">
+                                    <table id="query-results-listing-tencent" class="table">
+                                        <thead>
+                                        <tr>
+                                            <th v-for="column in tencentColumns" :key="column">{{ column }}</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-for="(row, rowIndex) in tencentResults" :key="rowIndex">
+                                            <td v-for="(value, key) in row" :key="key">{{ value }}</td>
+                                        </tr>
+                                        </tbody>
+                                </table>
+                                </div>
+                                <div v-if="tencentError" class="error">{{ tencentError }}</div>
+                            </div>
+                     </div>
+                    </div>
+                </div>
         
             </div>
 
@@ -80,6 +130,12 @@
         zhipuColumns: [],
         zhipuResults: [],
         zhipuError: '',
+        sparkColumns: [],
+        sparkResults: [],
+        sparkError: '',
+        tencentColumns: [],
+        tencentResults: [],
+        tencentError: '',
       }
     },
     methods: {
@@ -94,11 +150,21 @@
                 this.zhipuColumns = response.data.zhipuColumns;
                 this.zhipuResults = response.data.zhipuResults;
             }
+            if (response.data.sparkColumns && response.data.sparkResults) {
+                this.sparkColumns = response.data.sparkColumns;
+                this.sparkResults = response.data.sparkResults;
+            }
+            if (response.data.tencentColumns && response.data.tencentResults) {
+                this.tencentColumns = response.data.tencentColumns;
+                this.tencentResults = response.data.tencentResults;
+            }
           })
           .catch(error => {
             console.error('Error sending query:', error)
             this.chatglmError = 'Error sending query: ' + error;
             this.zhipuError = 'Error sending query: ' + error;
+            this.sparkError = 'Error sending query: ' + error;
+            this.tencentError = 'Error sending query: ' + error;
           })
       }
     }
