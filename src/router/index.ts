@@ -6,6 +6,7 @@ import Database from '@/views/Database.vue';
 import Login from '@/views/Login.vue';
 import ChartView from '../views/Visualize.vue';
 import naturalSQL from '@/views/NautralSQL.vue';
+import UploadFile from '@/views/UploadFile.vue';
 
 import navbarLayout from '@/layouts/navbarLayout.vue';
 import emptyLayout from '@/layouts/emptyLayout.vue';
@@ -41,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/database',
         name: 'Database',
         component: Database,
+      },
+      {
+        path: '/uploadfile',
+        name: 'UploadFile',
+        component: UploadFile,
       },
       {
         path: '/naturalsql',

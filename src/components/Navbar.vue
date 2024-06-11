@@ -159,7 +159,7 @@
             <div class="collapse" id="ui-basic">
               <ul class="nav flex-column sub-menu">
                 <li class="nav-item"> <a class="nav-link" @click="goToDatabase">查看数据库</a></li>
-                <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">修改/上传</a></li>
+                <li class="nav-item"> <a class="nav-link" @click="goToUploadfile">修改/上传</a></li>
               </ul>
             </div>
           </li>
@@ -252,6 +252,11 @@
       goToNaturalSQL() {
       this.$router.push({ path: '/naturalsql' }); 
       },
+      goToUploadfile() {
+      this.$router.push({ path: '/uploadfile' }); 
+      },
+
+
     },
     data() {
       return {
