@@ -40,19 +40,16 @@
                 <div class="card">
                     <div class="card-body" style="max-height: 300px; overflow-y: auto;">
                         <div v-if="selectedRecord">
-                            <h2>Database: {{ selectedRecord.database }}</h2>
-                            <p>Query: {{ selectedRecord.query }}</p>
-                            <p>Timestamp: {{ new Date(selectedRecord.timestamp).toLocaleString() }}</p>
                             <p class="card-title">Query Results</p>
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th v-for="column in selectedRecord.results.columns" :key="column">{{ column }}</th>
+                                            <th v-for="column in selectedRecord.columns" :key="column">{{ column }}</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr v-for="(row, rowIndex) in selectedRecord.results.rows" :key="rowIndex">
+                                        <tr v-for="(row, rowIndex) in selectedRecord.rows" :key="rowIndex">
                                             <td v-for="(value, key) in row" :key="key">{{ value }}</td>
                                         </tr>
                                     </tbody>
@@ -93,70 +90,54 @@ export default {
 
     methods: {
         viewResults(record) {
-    console.log('record:', record);
-    console.log('record.results:', record.results);
-    
-    // 检查结果是否存在
-    if (record.results) {
-        // 深拷贝结果数组
-        const results = JSON.parse(JSON.stringify(record.results));
-        console.log('results:', results);
-        
-        // 检查结果是否为数组
-        if (Array.isArray(results)) {
-            console.log(results.length);
-            // 检查结果数组是否为空
-            if (results.length > 0) {
-                // 使用第一个对象的属性作为列名
-                const columns = Object.keys(results[0]);
-                console.log('columns:', columns);
-                
-                // 将每个对象的值作为行数据
-                const rows = results.map(obj => Object.values(obj));
-                console.log('rows:', rows);
-                
-                // 更新selectedRecord
-                this.selectedRecord = {
-                    columns: columns,
-                    rows: rows
-                };
-                console.log('selectedRecord:', this.selectedRecord);
-            } else {
-                // 如果结果数组为空，则清空selectedRecord
+            console.log('record:', record);
+            console.log('record.results:', record.results);
+            
+            // 检查结果是否存在
+            if (record.results) {
+                // 深拷贝结果对象
+                const results = JSON.parse(JSON.stringify(record.results));
+                console.log('results:', results);
+                console.log(results.columns);
+                // 检查结果是否包含columns属性
+                if (results.columns) {
+                    // 提取列名
+                    const columns = Object.keys(results.columns[0]);
+                    console.log('columns:', columns);
+                    const rows = results.columns.map(column => Object.values(column));
+                    console.log('rows:', rows);
+                    this.selectedRecord = {
+                        columns: columns,
+                        rows: rows
+                    };
+                    console.log('selectedRecord:', this.selectedRecord);
+                    
+                } else {
+                    console.error('Columns not found in results:', results);
+                    // 如果结果中未找到columns属性，则清空selectedRecord
+                    this.selectedRecord = {
+                        columns: [],
+                        rows: []
+                    };
+                    console.log('selectedRecord:', this.selectedRecord);
+                }
+            }else {
+                // 如果结果不存在，则清空selectedRecord
                 this.selectedRecord = {
                     columns: [],
                     rows: []
                 };
                 console.log('selectedRecord:', this.selectedRecord);
             }
-        } else {
-            console.error('Results is not an array:', results);
-            // 如果结果不是数组，则清空selectedRecord
-            this.selectedRecord = {
-                columns: [],
-                rows: []
-            };
-            console.log('selectedRecord:', this.selectedRecord);
-        }
-    } else {
-        // 如果结果不存在，则清空selectedRecord
-        this.selectedRecord = {
-            columns: [],
-            rows: []
-        };
-        console.log('selectedRecord:', this.selectedRecord);
-    }
-}
-        
-                
 
+        }
     }
 }
 </script>
 
 <style scoped>
 .card-body {
-    max-height: 300px;
+    max-height: 500px;
     overflow-y: auto;
 }
 
