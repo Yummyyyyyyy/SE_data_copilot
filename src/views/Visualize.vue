@@ -1,69 +1,63 @@
 <template>
-    <div class="container container-custom">
-      <h2>可视化图表展示</h2>
-      <canvas ref="chartCanvas"></canvas>
-    </div>
-  </template>
+  <div class="container container-custom">
+    <h2>可视化图表展示</h2>
+    <button @click="selectChartType('pie')">饼图</button>
+    <button @click="selectChartType('line')">折线图</button>
+    <button @click="selectChartType('bar')">柱状图</button>
+    
+     
+  </div>
   
-  <script lang="ts">
-  import { defineComponent, onMounted, ref } from 'vue';
-  import Chart from 'chart.js/auto';
+  <img v-if="chartImageData" :src="chartImageData" alt="Chart">
+</template>
   
-  export default defineComponent({
-    setup() {
-      const chartCanvas = ref<HTMLCanvasElement | null>(null);
-  
-      onMounted(() => {
-        if (chartCanvas.value) {
-          new Chart(chartCanvas.value, {
-            type: 'bar',
-            data: {
-              labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-              datasets: [{
-                label: '# of Votes',
-                data: [12, 19, 3, 5, 2, 3],
-                backgroundColor: [
-                  'rgba(255, 99, 132, 0.2)',
-                  'rgba(54, 162, 235, 0.2)',
-                  'rgba(255, 206, 86, 0.2)',
-                  'rgba(75, 192, 192, 0.2)',
-                  'rgba(153, 102, 255, 0.2)',
-                  'rgba(255, 159, 64, 0.2)'
-                ],
-                borderColor: [
-                  'rgba(255, 99, 132, 1)',
-                  'rgba(54, 162, 235, 1)',
-                  'rgba(255, 206, 86, 1)',
-                  'rgba(75, 192, 192, 1)',
-                  'rgba(153, 102, 255, 1)',
-                  'rgba(255, 159, 64, 1)'
-                ],
-                borderWidth: 1
-              }]
-            },
-            options: {
-              scales: {
-                y: {
-                  beginAtZero: true
-                }
-              }
-            }
-          });
-        }
-      });
-  
-      return {
-        chartCanvas
-      };
+<script >
+import axios from 'axios';
+
+export default {
+  computed: {
+    columns() {
+      return this.$store.state.visualData.columns;
+    },
+    results() {
+      return this.$store.state.visualData.results;
     }
-  });
-  </script>
-  
-  <style scoped>
-  .container-custom {
-    margin-top: 20px;
-    width: 100%;
-    height: 100%;
+  },
+  data() {
+    return {
+      chartImageData: ''
+    };
+  },
+  methods: {
+    selectChartType(type) {
+      console.log(type);
+      console.log(this.columns);
+      console.log(this.results);
+      
+      axios.post('http://127.0.0.1:8000/visualize/', JSON.stringify({
+        chart_type: type,
+        columns: this.columns,
+        results: this.results
+      }), {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        const imageData = response.data.image_data;
+        this.chartImageData = `data:image/png;base64,${imageData}`;
+      })
+      .catch(error => {
+        console.error('Error sending chart type for visualization:', error);
+      });
+    }
   }
-  </style>
+};
+  
+ </script>
+
+  
+<style scoped>
+  
+</style>
   

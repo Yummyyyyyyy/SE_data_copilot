@@ -4,10 +4,10 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
 import Database from '@/views/Database.vue';
 import Login from '@/views/Login.vue';
-import ChartView from '../views/Visualize.vue';
 import naturalSQL from '@/views/NautralSQL.vue';
 import UploadFile from '@/views/UploadFile.vue';
 import history from '@/views/History.vue';
+import visualize from '@/views/Visualize.vue';
 
 import navbarLayout from '@/layouts/navbarLayout.vue';
 import emptyLayout from '@/layouts/emptyLayout.vue';
@@ -30,10 +30,6 @@ const routes: Array<RouteRecordRaw> = [
     path:'/',
     component: navbarLayout,
     children:[
-      {
-        path:'/visualize',
-        component:ChartView,
-      },
       {
         path: '/home',
         name: 'Home',
@@ -60,7 +56,13 @@ const routes: Array<RouteRecordRaw> = [
         name: 'History',
         component: history,
 
-      }
+      },
+      {
+        path: '/visualize',
+        name: 'Visualize',
+        component: visualize,
+
+      },
         
       
     ]
