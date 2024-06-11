@@ -182,7 +182,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="pages/icons/mdi.html">
+            <a class="nav-link" @click="goToHistory">
               <i class="mdi mdi-emoticon menu-icon"></i>
               <span class="menu-title">历史记录</span>
             </a>
@@ -254,6 +254,9 @@
       },
       goToUploadfile() {
       this.$router.push({ path: '/uploadfile' }); 
+      },
+      goToHistory() {
+      this.$router.push({ path: '/history' }); 
       },
 
 

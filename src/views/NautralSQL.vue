@@ -22,32 +22,39 @@
                     <button @click="sendQuery" class="btn btn-sm btn-primary" type="button">Send Query</button>
                     </div>
                 </div>
-            
+
                 <div class="col-md-6  grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <div v-if="chatglmResults.length">
-                                <h2>Results by GLM 3.6</h2>
+                            <div v-if="tencentResults.length">
+                                <h2>Results by Tencent</h2>
                                 <p class="card-title">Query Results</p>
                                 <div class="table-responsive">
-                                    <table id="query-results-listing-glm36" class="table">
+                                    <table id="query-results-listing-tencent" class="table">
                                         <thead>
                                         <tr>
-                                            <th v-for="column in chatglmColumns" :key="column">{{ column }}</th>
+                                            <th v-for="column in tencentColumns" :key="column">{{ column }}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="(row, rowIndex) in chatglmResults" :key="rowIndex">
+                                        <tr v-for="(row, rowIndex) in tencentResults" :key="rowIndex">
                                             <td v-for="(value, key) in row" :key="key">{{ value }}</td>
                                         </tr>
                                         </tbody>
                                 </table>
                                 </div>
-                                <div v-if="chatglmError" class="error">{{ chatglmError }}</div>
+                                <div v-if="tencentError" class="error">{{ tencentError }}</div>
                             </div>
-                     </div>
+                        </div>
+                        <div  v-if="tencentResults.length" class="btn-group" role="group" aria-label="Basic example">
+                          <button @click="saveRecord(tencentColumns, tencentResults)" type="button" class="btn btn-outline-secondary">选择并保存为记录</button>
+                          <button type="button" class="btn btn-outline-secondary">可视化</button>
+                          <button  @click="exportCSV('Tencent',tencentColumns, tencentResults)" type="button" class="btn btn-outline-secondary">导出</button>
+                        </div>
                     </div>
                 </div>
+            
+                
                 <div class="col-md-6  grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
@@ -72,8 +79,14 @@
                                 <div v-if="zhipuError" class="error">{{ zhipuError }}</div>
                             </div>
                         </div>
+                        <div  v-if="zhipuResults.length" class="btn-group" role="group" aria-label="Basic example">
+                          <button @click="saveRecord(zhipuColumns, zhipuResults)" type="button" class="btn btn-outline-secondary">选择并保存为记录</button>
+                          <button type="button" class="btn btn-outline-secondary">可视化</button>
+                          <button  @click="exportCSV('Zhipu',zhipuColumns, zhipuResults)" type="button" class="btn btn-outline-secondary">导出</button>
+                        </div>
                     </div>
                 </div>
+
                 <div class="col-md-6  grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
@@ -96,34 +109,46 @@
                                 </div>
                                 <div v-if="sparkError" class="error">{{ sparkError }}</div>
                             </div>
-                     </div>
+                        </div>
+                        <div  v-if="sparkResults.length" class="btn-group" role="group" aria-label="Basic example">
+                            <button @click="saveRecord(sparkColumns, sparkResults)" type="button" class="btn btn-outline-secondary">选择并保存为记录</button>
+                            <button type="button" class="btn btn-outline-secondary">可视化</button>
+                            <button  @click="exportCSV('Spark',sparkColumns, sparkResults)" type="button" class="btn btn-outline-secondary">导出</button>
+                        </div>
                     </div>
                 </div>
+
                 <div class="col-md-6  grid-margin stretch-card">
                     <div class="card">
                         <div class="card-body">
-                            <div v-if="tencentResults.length">
-                                <h2>Results by Tencent</h2>
+                            <div v-if="chatglmResults.length">
+                                <h2>Results by GLM 3.6</h2>
                                 <p class="card-title">Query Results</p>
                                 <div class="table-responsive">
-                                    <table id="query-results-listing-tencent" class="table">
+                                    <table id="query-results-listing-glm36" class="table">
                                         <thead>
                                         <tr>
-                                            <th v-for="column in tencentColumns" :key="column">{{ column }}</th>
+                                            <th v-for="column in chatglmColumns" :key="column">{{ column }}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr v-for="(row, rowIndex) in tencentResults" :key="rowIndex">
+                                        <tr v-for="(row, rowIndex) in chatglmResults" :key="rowIndex">
                                             <td v-for="(value, key) in row" :key="key">{{ value }}</td>
                                         </tr>
                                         </tbody>
                                 </table>
                                 </div>
-                                <div v-if="tencentError" class="error">{{ tencentError }}</div>
+                                <div v-if="chatglmError" class="error">{{ chatglmError }}</div>
                             </div>
                      </div>
+                     <div  v-if="chatglmResults.length" class="btn-group" role="group" aria-label="Basic example">
+                            <button @click="saveRecord(chatglmColumns, chatglmResults)" type="button" class="btn btn-outline-secondary">选择并保存为记录</button>
+                            <button type="button" class="btn btn-outline-secondary">可视化</button>
+                            <button  @click="exportCSV('Chatglm',chatglmColumns, chatglmResults)" type="button" class="btn btn-outline-secondary">导出</button>
+                        </div>
                     </div>
                 </div>
+                
         
             
 
@@ -191,7 +216,48 @@
             this.sparkError = 'Error sending query: ' + error;
             this.tencentError = 'Error sending query: ' + error;
           })
+      },
+      
+      saveRecord(modelName, columns, results) {
+        const record = {
+            database: this.selectedDatabase,
+            query: this.query,
+            results: { columns, rows: results },
+            timestamp: new Date().toISOString(),
+        };
+        axios.post('http://127.0.0.1:8000/save_record/', record)
+            .then(response => {
+                alert('记录已保存');
+            })
+            .catch(error => {
+                console.error('Error saving record:', error);
+            });
+    },
+      
+
+      exportCSV(modelName, columns, results) {
+        if (!results || !columns) {
+          console.error('Invalid result data for CSV export');
+          return;
+        }
+
+        // 构建 CSV 数据
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += columns.join(",") + "\n";
+        results.forEach(row => {
+          const values = columns.map(column => row[column]);
+          csvContent += values.join(",") + "\n";
+        });
+
+        // 创建下载链接并触发下载
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `${modelName}_query_results.csv`);
+        document.body.appendChild(link);
+        link.click();
       }
+
     },
     mounted() {
         // 获取数据库列表

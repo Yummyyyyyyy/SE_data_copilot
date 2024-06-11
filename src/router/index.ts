@@ -7,6 +7,7 @@ import Login from '@/views/Login.vue';
 import ChartView from '../views/Visualize.vue';
 import naturalSQL from '@/views/NautralSQL.vue';
 import UploadFile from '@/views/UploadFile.vue';
+import history from '@/views/History.vue';
 
 import navbarLayout from '@/layouts/navbarLayout.vue';
 import emptyLayout from '@/layouts/emptyLayout.vue';
@@ -52,6 +53,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/naturalsql',
         name: 'NaturalSQL',
         component: naturalSQL,
+
+      },
+      {
+        path: '/history',
+        name: 'History',
+        component: history,
 
       }
         
