@@ -1,99 +1,115 @@
 <template>
-   <div class="row" style="width:max-content">
-            <div class="col-md-12 stretch-card">
-              <div class="card">
-                <div class="card-body">
-                  <p class="card-title">Recent Purchases</p>
-                  <div class="table-responsive">
-                    <table id="recent-purchases-listing" class="table">
-                      <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Status report</th>
-                            <th>Office</th>
-                            <th>Price</th>
-                            <th>Date</th>
-                            <th>Gross amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                            <td>Jeremy Ortega</td>
-                            <td>Levelled up</td>
-                            <td>Catalinaborough</td>
-                            <td>$790</td>
-                            <td>06 Jan 2018</td>
-                            <td>$2274253</td>
-                        </tr>
-                        <tr>
-                            <td>Alvin Fisher</td>
-                            <td>Ui design completed</td>
-                            <td>East Mayra</td>
-                            <td>$23230</td>
-                            <td>18 Jul 2018</td>
-                            <td>$83127</td>
-                        </tr>
-                        <tr>
-                            <td>Emily Cunningham</td>
-                            <td>support</td>
-                            <td>Makennaton</td>
-                            <td>$939</td>
-                            <td>16 Jul 2018</td>
-                            <td>$29177</td>
-                        </tr>
-                        <tr>
-                            <td>Minnie Farmer</td>
-                            <td>support</td>
-                            <td>Agustinaborough</td>
-                            <td>$30</td>
-                            <td>30 Apr 2018</td>
-                            <td>$44617</td>
-                        </tr>
-                        <tr>
-                            <td>Betty Hunt</td>
-                            <td>Ui design not completed</td>
-                            <td>Lake Sandrafort</td>
-                            <td>$571</td>
-                            <td>25 Jun 2018</td>
-                            <td>$78952</td>
-                        </tr>
-                        <tr>
-                            <td>Myrtie Lambert</td>
-                            <td>Ui design completed</td>
-                            <td>Cassinbury</td>
-                            <td>$36</td>
-                            <td>05 Nov 2018</td>
-                            <td>$36422</td>
-                        </tr>
-                        <tr>
-                            <td>Jacob Kennedy</td>
-                            <td>New project</td>
-                            <td>Cletaborough</td>
-                            <td>$314</td>
-                            <td>12 Jul 2018</td>
-                            <td>$34167</td>
-                        </tr>
-                        <tr>
-                            <td>Ernest Wade</td>
-                            <td>Levelled up</td>
-                            <td>West Fidelmouth</td>
-                            <td>$484</td>
-                            <td>08 Sep 2018</td>
-                            <td>$50862</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
+  <div class="main-panel" style="margin-left:150px; width:950px">
+    <div class="content-wrapper">
+      <div class="row" >
+      <div class="col-md-4 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Database Tables</h4>
+            <select v-model="selectedDatabase" class="form-control">
+              <option v-for="database in databases" :value="database">{{ database }}</option>
+            </select>
+            <button class="btn btn-primary mt-3" @click="fetchTables">Confirm</button>
+            <ul class="list-group mt-3">
+              <li class="list-group-item" v-for="table in tables" :key="table">
+                <button @click="selectTable(table)" class="btn btn-link">{{ table }}</button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-8 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Table Data</h4>
+            <div v-if="selectedTable">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th v-for="column in columns" :key="column">{{ column }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(row, index) in rows" :key="index">
+                    <td v-for="(value, key) in row" :key="key">{{ value }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div v-else>
+              <p>No table selected</p>
             </div>
           </div>
+        </div>
+      </div>
+      </div>    
+    </div>   
+  </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
+const selectedDatabase = ref('');
+const databases = ref([]);
+const tables = ref([]);
+const selectedTable = ref('');
+const columns = ref([]);
+const rows = ref([]);
+
+// 获取所有数据库
+const fetchDatabases = () => {
+ axios.get('http://127.0.0.1:8000/databases/')
+   .then(response => {
+     databases.value = response.data.databases;
+     if (databases.value.length > 0) {
+       selectedDatabase.value = databases.value[0];  // 选择第一个数据库
+     }
+   })
+   .catch(error => {
+     console.error(error);
+   });
+};
+
+// 获取选定数据库的所有表名
+const fetchTables = () => {
+ axios.get(`http://127.0.0.1:8000/tables/${selectedDatabase.value}/`)
+   .then(response => {
+     tables.value = response.data.tables;
+   })
+   .catch(error => {
+     console.error(error);
+   });
+};
+
+// 获取选定表的所有数据
+const fetchTableData = () => {
+ axios.get(`http://127.0.0.1:8000/table/${selectedDatabase.value}/${selectedTable.value}/`)
+   .then(response => {
+     columns.value = response.data.columns;
+     rows.value = response.data.rows;
+   })
+   .catch(error => {
+     console.error(error);
+   });
+};
+
+// 选择数据库后更新表和表数据
+const selectDatabase = () => {
+ fetchTables();
+};
+
+// 选择表后更新表数据
+const selectTable = (table) => {
+ selectedTable.value = table;
+ fetchTableData();
+};
+
+// 初始加载时获取所有数据库
+onMounted(fetchDatabases);
 </script>
+
 <style scoped>
 
 </style>
-
